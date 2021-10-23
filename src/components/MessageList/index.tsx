@@ -32,9 +32,12 @@ export function MessageList() {
               <p>{message.text}</p>
               <div className={styles.messageUser}>
                 <div className={styles.userImage}>
-                  <img src={message.user.avatar_url} alt={message.user.name} />
+                  <img
+                    src={message.user.avatar_url}
+                    alt={message.user.name || "No Name"}
+                  />
                 </div>
-                <span>{message.user.name || "null"}</span>
+                <span>{message.user.name || "No Name"}</span>
               </div>
             </li>
           );
