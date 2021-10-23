@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../services/api";
 import styles from "./styles.module.scss";
 import logoImg from "../../assets/logo.svg";
+import io from "socket.io-client";
 
 interface MessageProps {
   id: string;
@@ -12,8 +13,28 @@ interface MessageProps {
   };
 }
 
+const messagesQeue: MessageProps[] = [];
+
+const socket = io("http://localhost:4000");
+
+socket.on("new_message", (newMessage: MessageProps) => {
+  messagesQeue.push(newMessage);
+});
+
 export function MessageList() {
   const [messages, setMessages] = useState<MessageProps[]>();
+
+  useEffect(() => {
+    setInterval(() => {
+      if (messagesQeue.length > 0) {
+        setMessages((prevState) =>
+          [messagesQeue[0], prevState[0], prevState[1]].filter(Boolean)
+        );
+
+        messagesQeue.shift();
+      }
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     api.get<MessageProps[]>("messages/last3").then((response) => {
